@@ -56,6 +56,16 @@
           "name": "Undeployed Local Labs"
         },
         {
+          "id": "dockerImages",
+          "name": "Docker Images",
+          "icon": "$(package)"
+        },
+        {
+          "id": "containerlabTemplates",
+          "name": "Templates",
+          "icon": "$(library)"
+        },
+        {
           "id": "helpFeedback",
           "name": "Help & Feedback"
         }
@@ -473,6 +483,59 @@
         "command": "containerlab.treeView.localLabs.clearFilter",
         "title": "Clear local labs filter",
         "icon": "$(close)"
+      },
+      {
+        "command": "containerlab.dockerImages.refresh",
+        "title": "Refresh Docker Images",
+        "icon": "$(refresh)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.dockerImages.search",
+        "title": "Filter Docker Images",
+        "icon": "$(search)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.dockerImages.copyImage",
+        "title": "Copy Image Reference",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.refresh",
+        "title": "Refresh Templates",
+        "icon": "$(refresh)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.create",
+        "title": "Create Template",
+        "icon": "$(add)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.delete",
+        "title": "Delete Template",
+        "icon": "$(trash)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.edit",
+        "title": "Edit Template",
+        "icon": "$(edit)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.preview",
+        "title": "Preview Template",
+        "icon": "$(eye)",
+        "category": "Containerlab"
+      },
+      {
+        "command": "containerlab.template.openFolder",
+        "title": "Open Templates Folder",
+        "icon": "$(folder-opened)",
+        "category": "Containerlab"
       }
     ],
     "submenus": [
@@ -557,6 +620,31 @@
           "command": "containerlab.treeView.localLabs.clearFilter",
           "when": "view == localLabs",
           "group": "navigation@99"
+        },
+        {
+          "command": "containerlab.dockerImages.refresh",
+          "when": "view == dockerImages",
+          "group": "navigation@1"
+        },
+        {
+          "command": "containerlab.dockerImages.search",
+          "when": "view == dockerImages",
+          "group": "navigation@2"
+        },
+        {
+          "command": "containerlab.template.refresh",
+          "when": "view == containerlabTemplates",
+          "group": "navigation@1"
+        },
+        {
+          "command": "containerlab.template.create",
+          "when": "view == containerlabTemplates",
+          "group": "navigation@2"
+        },
+        {
+          "command": "containerlab.template.openFolder",
+          "when": "view == containerlabTemplates",
+          "group": "navigation@3"
         }
       ],
       "editor/title": [
@@ -946,6 +1034,21 @@
           "command": "containerlab.lab.gotty.copyLink",
           "when": "viewItem == containerlabGottyLink",
           "group": "navigation@0"
+        },
+        {
+          "command": "containerlab.template.edit",
+          "when": "viewItem == nodeTemplate || viewItem == stackTemplate",
+          "group": "inline@0"
+        },
+        {
+          "command": "containerlab.template.preview",
+          "when": "viewItem == nodeTemplate || viewItem == stackTemplate",
+          "group": "inline@1"
+        },
+        {
+          "command": "containerlab.template.delete",
+          "when": "viewItem == nodeTemplate || viewItem == stackTemplate",
+          "group": "inline@2"
         }
       ],
       "commandPalette": [

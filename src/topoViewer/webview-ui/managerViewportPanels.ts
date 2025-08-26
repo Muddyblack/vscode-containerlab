@@ -121,10 +121,9 @@ export class ManagerViewportPanels {
     const extraData = node.data('extraData') || {};
 
     // Set the node image in the editor based on YAML data or fallback.
-    const panelNodeEditorImageLabel = document.getElementById('panel-node-editor-image') as HTMLInputElement;
-    if (panelNodeEditorImageLabel) {
-      panelNodeEditorImageLabel.value = extraData.image ?? '';
-    }
+    const currentImage = extraData.image ?? '';
+    const currentKind = extraData.kind || this.panelNodeEditorKind;
+    this.panelNodeEditorPopulateImageDropdown(currentKind, currentImage);
 
     // Set the node type in the editor.
     this.panelNodeEditorKind = extraData.kind || this.panelNodeEditorKind;
@@ -173,7 +172,8 @@ export class ManagerViewportPanels {
 
       this.panelNodeEditorPopulateTopoViewerRoleDropdown(nodeIcons);
 
-
+      // Setup image dropdown
+      this.panelNodeEditorSetupImageDropdown();
 
       // Register the close button event.
       const panelNodeEditorCloseButton = document.getElementById("panel-node-editor-close-button");
@@ -454,7 +454,7 @@ export class ManagerViewportPanels {
 
     // Get the input values.
     const nodeNameInput = document.getElementById("panel-node-editor-name") as HTMLInputElement;
-    const nodeImageInput = document.getElementById("panel-node-editor-image") as HTMLInputElement;
+    const nodeImageInput = document.getElementById("panel-node-image-dropdown-container-filter-input") as HTMLInputElement;
     const typeDropdownInput = document.getElementById("panel-node-type-dropdown-container-filter-input") as HTMLInputElement;
     const typeInput = document.getElementById("panel-node-editor-type-input") as HTMLInputElement;
 
@@ -730,17 +730,9 @@ export class ManagerViewportPanels {
         }
 
         const imageMap = window.imageMapping || {};
-        const imageInput = document.getElementById('panel-node-editor-image') as HTMLInputElement;
-        if (imageInput) {
-          const mappedImage = imageMap[selectedValue];
-          if (mappedImage !== undefined) {
-            imageInput.value = mappedImage;
-            imageInput.dispatchEvent(new Event('input'));
-          } else if (mappedImage === undefined) {
-            imageInput.value = '';
-            imageInput.dispatchEvent(new Event('input'));
-          }
-        }
+        const mappedImage = imageMap[selectedValue] || '';
+        // Update the image dropdown with new options for the selected kind
+        this.panelNodeEditorPopulateImageDropdown(selectedValue, mappedImage);
       },
       'Search for kind...'
     );
@@ -808,6 +800,97 @@ export class ManagerViewportPanels {
       },
       'Search for role...'
     );
+  }
+
+  private panelNodeEditorSetupImageDropdown(): void {
+    // Initially create the dropdown with empty options
+    // It will be populated when a node is selected based on its kind
+    this.createFilterableDropdown(
+      'panel-node-image-dropdown-container',
+      [],
+      '',
+      (selectedValue: string) => {
+        log.debug(`Image ${selectedValue} selected`);
+        // Update will happen through the dropdown itself
+      },
+      'Search for image or enter custom...',
+      true // Allow custom values
+    );
+  }
+
+  private async panelNodeEditorPopulateImageDropdown(kind: string, currentImage: string): Promise<void> {
+    try {
+      // Try to fetch real Docker images from the extension
+      let images: string[] = [];
+      
+      try {
+        const result = await window.backendRequest('getDockerImages', { kind });
+        if (Array.isArray(result)) {
+          images = result;
+        }
+      } catch (err) {
+        log.warn('Failed to fetch Docker images from backend, using fallback:', err);
+      }
+      
+      // If no images from backend, use fallback
+      if (images.length === 0) {
+        const imageMap = window.imageMapping || {};
+        const defaultImage = imageMap[kind] || '';
+        images = this.getCommonImagesForKind(kind);
+        
+        if (defaultImage && !images.includes(defaultImage)) {
+          images.unshift(defaultImage);
+        }
+      }
+      
+      // Include current image if it's not in the list
+      if (currentImage && !images.includes(currentImage)) {
+        images.unshift(currentImage);
+      }
+      
+      // Update the dropdown
+      this.createFilterableDropdown(
+        'panel-node-image-dropdown-container',
+        images,
+        currentImage || '',
+        (selectedValue: string) => {
+          log.debug(`Image ${selectedValue} selected`);
+        },
+        'Search for image or enter custom...',
+        true // Allow custom values
+      );
+    } catch (error) {
+      log.error('Failed to populate image dropdown:', error);
+    }
+  }
+
+  private getCommonImagesForKind(kind: string): string[] {
+    // Define common images for each kind
+    const commonImages: Record<string, string[]> = {
+      'nokia_srlinux': [
+        'ghcr.io/nokia/srlinux:latest',
+        'ghcr.io/nokia/srlinux:24.10.1',
+        'ghcr.io/nokia/srlinux:24.7.2',
+        'ghcr.io/nokia/srlinux:24.3.4',
+        'ghcr.io/nokia/srlinux:23.10.4'
+      ],
+      'nokia_sros': [
+        'vr-sros:latest',
+        'vrnetlab/vr-sros:latest'
+      ],
+      'arista_ceos': [
+        'ceos:latest',
+        'arista/ceos:latest'
+      ],
+      'linux': [
+        'alpine:latest',
+        'ubuntu:latest',
+        'debian:latest',
+        'nicolaka/netshoot:latest'
+      ]
+    };
+    
+    return commonImages[kind] || [];
   }
 
   /**
@@ -987,7 +1070,8 @@ export class ManagerViewportPanels {
     options: string[],
     currentValue: string,
     onSelect: (value: string) => void, // eslint-disable-line no-unused-vars
-    placeholder: string = 'Type to filter...'
+    placeholder: string = 'Type to filter...',
+    allowCustom: boolean = false
   ): void {
     const container = document.getElementById(containerId);
     if (!container) {

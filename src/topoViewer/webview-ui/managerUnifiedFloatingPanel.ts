@@ -156,6 +156,10 @@ export class ManagerUnifiedFloatingPanel {
     document.addEventListener('unified-add-bulk-link-click', () => {
       this.handleAddBulkLink();
     });
+
+    document.addEventListener('unified-templates-click', () => {
+      this.handleTemplatesClick();
+    });
   }
 
   // All UI class/style updates are handled in HTML
@@ -486,6 +490,21 @@ export class ManagerUnifiedFloatingPanel {
       log.info('Bulk link panel opened via unified panel');
     } else {
       log.error('Topology controller or showBulkLinkPanel method not available');
+    }
+  }
+
+  /**
+   * Handles templates panel toggle
+   */
+  private handleTemplatesClick(): void {
+    log.debug('Templates clicked');
+    
+    // Get the templates panel from the topology controller
+    const controller = (window as any).topologyWebviewController;
+    if (controller?.templatesPanel) {
+      controller.templatesPanel.togglePanel();
+    } else {
+      log.warn('Templates panel not available');
     }
   }
 

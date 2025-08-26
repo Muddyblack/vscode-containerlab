@@ -13,6 +13,8 @@ import { WelcomePage } from './welcomePage';
 import { LocalLabTreeDataProvider } from './treeView/localLabsProvider';
 import { RunningLabTreeDataProvider } from './treeView/runningLabsProvider';
 import { HelpFeedbackProvider } from './treeView/helpFeedbackProvider';
+import { registerDockerImagesTreeView } from './treeView/dockerImagesProvider';
+import { registerTemplateTreeView } from './treeView/templateProvider';
 
 /** Our global output channel */
 export let outputChannel: vscode.LogOutputChannel;
@@ -170,6 +172,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   await refreshSshxSessions();
   await refreshGottySessions();
+
+  // Register Docker Images tree view
+  registerDockerImagesTreeView(context);
+  
+  // Register Templates tree view
+  registerTemplateTreeView(context);
 
 
   localTreeView = vscode.window.createTreeView('localLabs', {

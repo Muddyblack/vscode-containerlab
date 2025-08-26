@@ -16,6 +16,7 @@ import { ManagerSaveTopo } from './managerSaveTopo';
 import { ManagerUndo } from './managerUndo';
 import { ManagerAddContainerlabNode } from './managerAddContainerlabNode';
 import { ManagerViewportPanels } from './managerViewportPanels';
+import { ManagerTemplatesPanel } from './managerTemplatesPanel';
 import { ManagerUnifiedFloatingPanel } from './managerUnifiedFloatingPanel';
 import { ManagerFreeText } from './managerFreeText';
 import { ManagerGroupStyle } from './managerGroupStyle';
@@ -54,6 +55,7 @@ class TopologyWebviewController {
   public undoManager: ManagerUndo;
   public addNodeManager: ManagerAddContainerlabNode;
   public viewportPanels?: ManagerViewportPanels;
+  public templatesPanel?: ManagerTemplatesPanel;
   public unifiedFloatingPanel: ManagerUnifiedFloatingPanel | null = null;
   public groupManager: ManagerGroupManagement;
   public groupStyleManager: ManagerGroupStyle;
@@ -316,6 +318,7 @@ class TopologyWebviewController {
 
     if (mode === 'edit') {
       this.viewportPanels = new ManagerViewportPanels(this.saveManager, this.cy);
+      this.templatesPanel = new ManagerTemplatesPanel(this.cy);
     }
 
     // Initialize unified floating panel for both modes

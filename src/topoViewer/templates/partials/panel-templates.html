@@ -1,0 +1,95 @@
+<!-- Templates Panel -->
+<div class="panel-overlay fixed left-5 top-1/2 transform -translate-y-1/2 w-64 z-[21] draggable-panel max-h-[70vh] overflow-hidden flex flex-col"
+  id="panel-templates" style="display: none;">
+  <p class="panel-heading text-base font-bold flex items-center justify-between">
+    <span>Templates</span>
+    <button class="btn btn-sm" id="panel-templates-close-button">
+      <i class="fas fa-times"></i>
+    </button>
+  </p>
+  
+  <div class="p-4 flex-1 overflow-y-auto">
+    <!-- Search/Filter Input -->
+    <div class="mb-4">
+      <input type="text" id="template-search" class="input-field w-full" 
+        placeholder="Search templates...">
+    </div>
+    
+    <!-- Template Categories -->
+    <div class="space-y-4">
+      <!-- Node Templates -->
+      <div class="template-category">
+        <h3 class="text-sm font-semibold mb-2 flex items-center">
+          <i class="fas fa-chevron-down mr-2 text-xs template-category-toggle cursor-pointer"></i>
+          Node Templates
+        </h3>
+        <div class="template-list space-y-2" id="node-templates-list">
+          <!-- Node templates will be populated here -->
+        </div>
+      </div>
+      
+      <!-- Stack Templates -->
+      <div class="template-category">
+        <h3 class="text-sm font-semibold mb-2 flex items-center">
+          <i class="fas fa-chevron-down mr-2 text-xs template-category-toggle cursor-pointer"></i>
+          Stack Templates
+        </h3>
+        <div class="template-list space-y-2" id="stack-templates-list">
+          <!-- Stack templates will be populated here -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Help Text -->
+    <div class="mt-4 text-xs text-gray-500">
+      <p>Drag templates onto the canvas to add them to your topology.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Template Item Template (for cloning) -->
+<template id="template-item-template">
+  <div class="template-item p-2 rounded border border-gray-300 cursor-move hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+    draggable="true">
+    <div class="flex items-center">
+      <i class="template-icon mr-2"></i>
+      <div class="flex-1">
+        <div class="template-name text-sm font-medium"></div>
+        <div class="template-description text-xs text-gray-500"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  #panel-templates {
+    background-color: var(--vscode-sideBar-background);
+    border: 1px solid var(--vscode-panel-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .template-item {
+    background-color: var(--vscode-editor-background);
+    border-color: var(--vscode-panel-border);
+  }
+  
+  .template-item:hover {
+    background-color: var(--vscode-list-hoverBackground);
+  }
+  
+  .template-item.dragging {
+    opacity: 0.5;
+  }
+  
+  .template-category-toggle {
+    transition: transform 0.2s;
+  }
+  
+  .template-category.collapsed .template-category-toggle {
+    transform: rotate(-90deg);
+  }
+  
+  .template-category.collapsed .template-list {
+    display: none;
+  }
+</style>

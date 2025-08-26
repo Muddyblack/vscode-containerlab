@@ -126,6 +126,16 @@
       data-tippy-content="Bulk Link Devices">
       <i class="fas fa-link text-[10px]"></i>
     </button>
+
+    <!-- Divider -->
+    <div class="h-px bg-[var(--vscode-panel-border)] my-[2px]"></div>
+
+    <!-- Templates Button -->
+    <button id="templates-btn"
+      class="bg-[var(--vscode-button-secondaryBackground)] text-[var(--vscode-button-secondaryForeground)] border border-transparent rounded p-[6px] cursor-pointer flex items-center justify-center text-[12px] transition-all duration-150 w-[28px] h-[28px] hover:bg-[var(--vscode-button-secondaryHoverBackground)] hover:-translate-y-[1px]"
+      data-tippy-content="Templates">
+      <i class="fas fa-cube text-[10px]"></i>
+    </button>
   </div> <!-- End panel-content -->
 
   <!-- Collapse Control Section -->
@@ -689,6 +699,15 @@
       addBulkLinkBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         const event = new CustomEvent('unified-add-bulk-link-click');
+        document.dispatchEvent(event);
+      });
+    }
+
+    const templatesBtn = document.getElementById('templates-btn');
+    if (templatesBtn) {
+      templatesBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const event = new CustomEvent('unified-templates-click');
         document.dispatchEvent(event);
       });
     }

@@ -14,6 +14,7 @@ import { runningLabsProvider } from "../../extension";
 import { validateYamlContent } from '../utilities/yamlValidator';
 import { saveViewport } from '../utilities/saveViewport';
 import { annotationsManager } from '../utilities/annotationsManager';
+import { DockerImageProvider } from '../../helpers/dockerImageProvider';
 
 /**
  * Class representing the TopoViewer Editor Webview Panel.
@@ -1242,6 +1243,102 @@ topology:
             const clipboard = this.context.globalState.get('topoClipboard') || [];
             panel.webview.postMessage({ type: 'copiedElements', data: clipboard });
             result = 'Clipboard sent';
+            break;
+          }
+
+          case 'getDockerImages': {
+            try {
+              const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
+              const kind = data?.kind;
+              const dockerImageProvider = DockerImageProvider.getInstance();
+              
+              // Ensure images are loaded
+              await dockerImageProvider.getImages();
+              
+              let images: string[] = [];
+              if (kind) {
+                // Get images for specific kind
+                images = dockerImageProvider.getAvailableImagesForKind(kind);
+              } else {
+                // Get all available images
+                images = dockerImageProvider.getAllAvailableImages();
+              }
+              
+              result = images;
+              log.info(`Retrieved ${images.length} Docker images for kind: ${kind || 'all'}`);
+            } catch (err) {
+              error = `Failed to get Docker images: ${err}`;
+              log.error(error);
+            }
+            break;
+          }
+
+          case 'getTemplates': {
+            try {
+              // For now, return some default templates
+              // Later this will fetch from the TemplateManager
+              const templates = [
+                {
+                  id: 'srlinux',
+                  name: 'SR Linux',
+                  description: 'Nokia SR Linux router',
+                  kind: 'nokia_srlinux',
+                  image: 'ghcr.io/nokia/srlinux:latest',
+                  type: 'ixrd3',
+                  topoViewerRole: 'pe'
+                },
+                {
+                  id: 'ceos',
+                  name: 'Arista cEOS',
+                  description: 'Arista cEOS switch',
+                  kind: 'arista_ceos',
+                  image: 'ceos:latest',
+                  topoViewerRole: 'pe'
+                },
+                {
+                  id: 'linux-host',
+                  name: 'Linux Host',
+                  description: 'Alpine Linux host',
+                  kind: 'linux',
+                  image: 'alpine:latest',
+                  topoViewerRole: 'host'
+                },
+                {
+                  id: 'telemetry-stack',
+                  name: 'Telemetry Stack',
+                  description: 'Grafana, Prometheus, and Alloy',
+                  topology: {
+                    name: 'telemetry',
+                    nodes: {
+                      grafana: {
+                        kind: 'linux',
+                        image: 'grafana/grafana:latest',
+                        ports: ['3000:3000']
+                      },
+                      prometheus: {
+                        kind: 'linux',
+                        image: 'prom/prometheus:latest',
+                        ports: ['9090:9090']
+                      },
+                      alloy: {
+                        kind: 'linux',
+                        image: 'grafana/alloy:latest'
+                      }
+                    },
+                    links: [
+                      { endpoints: ['grafana:eth1', 'prometheus:eth1'] },
+                      { endpoints: ['prometheus:eth2', 'alloy:eth1'] }
+                    ]
+                  }
+                }
+              ];
+              
+              result = templates;
+              log.info(`Retrieved ${templates.length} templates`);
+            } catch (err) {
+              error = `Failed to get templates: ${err}`;
+              log.error(error);
+            }
             break;
           }
 
