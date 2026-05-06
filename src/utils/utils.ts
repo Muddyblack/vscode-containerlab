@@ -330,7 +330,7 @@ export async function getSelectedLabNode(
     labPath = vscode.window.activeTextEditor?.document.uri.fsPath;
   }
 
-  if (labPath === undefined || labPath === '' || !/\.clab\.(yml|yaml)$/i.test(labPath)) {
+  if (labPath === undefined || labPath === "" || !/\.clab\.(yml|yaml)$/i.test(labPath)) {
     return undefined;
   }
 
