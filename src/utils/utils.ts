@@ -315,19 +315,22 @@ export async function checkAndUpdateClabIfNeeded(
 // ----------------------------------------------------------
 
 export async function getSelectedLabNode(
-  node?: ClabLabTreeNode
+  node?: ClabLabTreeNode | vscode.Uri
 ): Promise<ClabLabTreeNode | undefined> {
-  if (node) {
+  if (node instanceof ClabLabTreeNode) {
     return node;
   }
 
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    return undefined;
+  // Editor title buttons and explorer/context menus pass the resource Uri
+  // instead of a tree node. Fall back to the active editor when no Uri is given.
+  let labPath: string | undefined;
+  if (node instanceof vscode.Uri) {
+    labPath = node.fsPath;
+  } else {
+    labPath = vscode.window.activeTextEditor?.document.uri.fsPath;
   }
 
-  const labPath = editor.document.uri.fsPath;
-  if (!/\.clab\.(yml|yaml)$/i.test(labPath)) {
+  if (!labPath || !/\.clab\.(yml|yaml)$/i.test(labPath)) {
     return undefined;
   }
 
